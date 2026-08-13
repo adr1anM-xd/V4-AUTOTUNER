@@ -510,8 +510,13 @@ function setupNativeNodePipeline() {
   ensureAudioCtx();
   if (pitchWorkletNode) pitchWorkletNode.disconnect();
 
-  // Usamos ScriptProcessor de tamaño pequeño (1024) para menor latencia mientras dibujamos
-  pitchWorkletNode = audioCtx.createScriptProcessor(1024, 1, 1);
+  // Detecta si el usuario está en celular/tablet o en PC
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  
+  // En celulares usa 4096 (sin cortes), en PC usa 1024 (cero latencia)
+  const bufferSize = isMobile ? 4096 : 1024;
+
+  pitchWorkletNode = audioCtx.createScriptProcessor(bufferSize, 1, 1);
   analyserNode = audioCtx.createAnalyser();
   analyserNode.fftSize = 256;
 
